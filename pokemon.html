@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokémon 圖鑑</title>
+    <style>
+        body {
+            margin: 0;
+        }
+
+        video {
+            object-fit: cover;
+            width: 100%;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+        #extraImageContainer {
+            text-align: center;
+            margin-top: 20px;
+            width: 400px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header img {
+            width: 200px; /* 調整 logo 寬度 */
+        }
+
+        .card-container {
+            text-align: center;
+            margin: 0 auto;
+            max-width: 800px; /* 控制最大寬度 */
+        }
+
+        .card {
+            border: 2px solid rgb(216, 19, 167);
+            border-radius: 10px;
+            background-color: #f0f0f0;
+            width: 150px;
+            text-align: center;
+            margin: 10px;
+            padding: 10px;
+            display: inline-block;
+            vertical-align: top; /* 控制元素上下對齊 */
+        }
+
+        .card img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+        }
+        .card img:hover {
+            transform: rotate(360deg);
+            transition: transform 0.5s;
+        }
+        
+
+        .load-more {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .load-more button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .left-frame,
+        .right-frame {
+            position: fixed;
+            height: 100vh;
+            width: 20px;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: frameAnimation 4s infinite;
+        }
+
+        @keyframes frameAnimation {
+            0%, 100% {
+                height: 100vh;
+            }
+            50% {
+                height: 50vh;
+            }
+        }
+
+        .left-frame {
+            left: 0;
+            top: 0;
+        }
+
+        .right-frame {
+            right: 0;
+            top: 0;
+        }
+        .left-window{
+            position: fixed;
+            top: 10%;
+            left: 1%;
+            height: 80%;
+            width: 20%;
+            background-color: rgba(255, 255, 255, 0);
+            border: 2px solid #00000000;
+            overflow: hidden;
+            display: flex;
+            justify-content:center;
+            align-items:center;
+            transition: opacity 0.5s;
+        }
+        .right-window {
+            position: fixed;
+            top: 10%;
+            right: 1%;
+            height: 80%;
+            width: 20%;
+            background-color: rgba(255, 255, 255, 0);
+            border: 2px solid #00000000;
+            overflow: hidden;
+            display: flex;
+            justify-content:center;
+            align-items:center;
+            transition: opacity 0.5s;
+        }
+
+        .window-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .window-content img {
+            max-width: 100%;
+            max-height: 100%;
+            transition: opacity 0.5s;
+        }
+        .hidden {
+            opacity: 0;
+        }
+        
+        .a {
+            width: 100px; 
+            height: auto;
+            position: absolute;
+            top: 100px;
+            left: 100px;
+        }
+
+        .b {
+            width: 100px; 
+            height: auto;
+            position: absolute;
+            top: 250px;
+            left: 100px;
+        }
+
+        .c {
+            width: 100px; 
+            height: auto;
+            position: absolute;
+            top: 400px;
+            left: 100px;
+        }
+
+        .d {
+            width: 100px; 
+            height: auto;
+            position: absolute;
+            top: 550px;
+            left: 100px;
+        }
+
+        .e {
+            width: 100px; 
+            height: auto;
+            position: absolute;
+            top: 700px;
+            left: 100px;
+        }
+
+    </style>
+</head>
+
+<body>
+    <video autoplay loop muted>
+        <source src="images/Pokemon Background Loop.mp4" type="video/mp4">
+    </video>
+    <div class="left-frame"></div>
+    <div class="right-frame"></div>
+    <div class="left-window" id="leftWindow">
+        <div class="window-content">
+            <img src="" alt="Random Image">
+        </div>
+    </div>
+
+    <div class="right-window" id="rightWindow">
+        <div class="window-content">
+            <img src="" alt="Random Image">
+        </div>
+    </div>
+    <div class="header">
+        <img src="images/logo.png" alt="Logo">
+    </div>
+
+    <div class="card-container" id="cardContainer">
+        <!-- 寶可夢卡片將會動態加入至這裡 -->
+    </div>
+
+    <div id="extraImageContainer"></div>
+
+    <div class="load-more" id="loadMoreContainer">
+        <button onclick="loadMore()">顯示更多</button>
+    </div>
+    <img class="a" src="images/pokeball.png" alt="Image A">
+    <img class="b" src="images/pokeball.png" alt="Image B">
+    <img class="c" src="images/pokeball.png" alt="Image C">
+    <img class="d" src="images/pokeball.png" alt="Image D">
+    <img class="e" src="images/pokeball.png" alt="Image E">
+    <script src="gsap-public/minified/gsap.min.js"></script>
+    <script src="gsap-public/minified/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.4/gsap.min.js"></script>
+    <script src="jquery-3.7.1.min.js"></script>
+    <script>
+        // 這裡放入寶可夢的資料
+        const pokemonData = [
+        {
+            name: '妙蛙種子',
+            type: '草、毒',
+            height: '0.7m',
+            weight: '6.9kg',
+            image: 'images/妙蛙種子.png'
+        },
+        {
+            name: '妙蛙草',
+            type: '草、毒',
+            height: '1.0m',
+            weight: '13.0kg',
+            image: 'images/妙蛙草.png'
+        },
+        {
+            name: '妙蛙花',
+            type: '草、毒',
+            height: '2.0m',
+            weight: '100.0kg',
+            image: 'images/妙蛙花.png'
+        },
+        {
+            name: '小火龍',
+            type: '火',
+            height: '0.6m',
+            weight: '8.5kg',
+            image: 'images/小火龍.png'
+        },
+        {
+            name: '火恐龍',
+            type: '火',
+            height: '1.1m',
+            weight: '19.0kg',
+            image: 'images/火恐龍.png'
+        },
+        {
+            name: '噴火龍',
+            type: '火',
+            height: '1.7m',
+            weight: '90.5kg',
+            image: 'images/噴火龍.png'
+        },
+        {
+            name: '傑尼龜',
+            type: '水',
+            height: '0.5m',
+            weight: '9.0kg',
+            image: 'images/傑尼龜.png'
+        },
+        {
+            name: '卡咪龜',
+            type: '水',
+            height: '1.0m',
+            weight: '22.5kg',
+            image: 'images/卡咪龜.png'
+        },
+        {
+            name: '水箭龜',
+            type: '水',
+            height: '1.6m',
+            weight: '85.5kg',
+            image: 'images/水箭龜.png'
+        },
+        {
+            name: '綠毛蟲',
+            type: '蟲',
+            height: '0.3m',
+            weight: '2.9kg',
+            image: 'images/綠毛蟲.png'
+        },
+        {
+            name: '鐵甲蛹',
+            type: '蟲',
+            height: '0.7m',
+            weight: '9.9kg',
+            image: 'images/鐵甲蛹.png'
+        },
+        {
+            name: '巴大蝶',
+            type: '蟲',
+            height: '1.1m',
+            weight: '32.0kg',
+            image: 'images/巴大蝶.png'
+        },
+        {
+            name: '獨角蟲',
+            type: '蟲、毒',
+            height: '0.3m',
+            weight: '3.2kg',
+            image: 'images/獨角蟲.png'
+        },
+        {
+            name: '鐵殼蛹',
+            type: '蟲、毒',
+            height: '0.6m',
+            weight: '10.0kg',
+            image: 'images/鐵殼蛹.png'
+        },
+        {
+            name: '大針蜂',
+            type: '蟲、毒',
+            height: '1.0m',
+            weight: '29.5kg',
+            image: 'images/大針蜂.png'
+        },
+        {
+            name: '波波',
+            type: '一般、飛行',
+            height: '0.3m',
+            weight: '1.8kg',
+            image: 'images/波波.png'
+        },
+        {
+            name: '比比鳥',
+            type: '一般、飛行',
+            height: '1.1m',
+            weight: '30.0kg',
+            image: 'images/比比鳥.png'
+        },
+        {
+            name: '大比鳥',
+            type: '一般、飛行',
+            height: '1.5m',
+            weight: '39.5kg',
+            image: 'images/大比鳥.png'
+        },
+        {
+            name: '小拉達',
+            type: '一般',
+            height: '0.3m',
+            weight: '3.5kg',
+            image: 'images/小拉達.png'
+        },
+        {
+            name: '拉達',
+            type: '一般',
+            height: '0.7m',
+            weight: '18.5kg',
+            image: 'images/拉達.png'
+        },
+        {
+            name: '烈雀',
+            type: '一般、飛行',
+            height: '0.3m',
+            weight: '2.0kg',
+            image: 'images/烈雀.png'
+        },
+        {
+            name: '大嘴雀',
+            type: '一般、飛行',
+            height: '1.2m',
+            weight: '38.0kg',
+            image: 'images/大嘴雀.png'
+        },
+        {
+            name: '阿柏蛇',
+            type: '毒',
+            height: '2.0m',
+            weight: '6.9kg',
+            image: 'images/阿柏蛇.png'
+        },
+        {
+            name: '阿柏怪',
+            type: '毒',
+            height: '3.5m',
+            weight: '65.0kg',
+            image: 'images/阿柏怪.png'
+        },
+        {
+            name: '皮卡丘',
+            type: '電',
+            height: '0.4m',
+            weight: '6.0kg',
+            image: 'images/皮卡丘.png'
+        },
+        {
+            name: '雷丘',
+            type: '電',
+            height: '0.8m',
+            weight: '30.0kg',
+            image: 'images/雷丘.png'
+        },
+        {
+            name: '穿山鼠',
+            type: '地面',
+            height: '0.6m',
+            weight: '12.0kg',
+            image: 'images/穿山鼠.png'
+        },
+        {
+            name: '穿山王',
+            type: '地面',
+            height: '1.0m',
+            weight: '29.5kg',
+            image: 'images/穿山王.png'
+        },
+        {
+            name: '尼多蘭',
+            type: '毒',
+            height: '0.4m',
+            weight: '7.0kg',
+            image: 'images/尼多蘭.png'
+        },
+        {
+            name: '尼多娜',
+            type: '毒',
+            height: '0.8m',
+            weight: '20.0kg',
+            image: 'images/尼多娜.png'
+        },
+        {
+            name: '尼多后',
+            type: '毒、地面',
+            height: '1.3m',
+            weight: '60.0kg',
+            image: 'images/尼多后.png'
+        },
+        {
+            name: '尼多朗',
+            type: '毒',
+            height: '0.5m',
+            weight: '9.0kg',
+            image: 'images/尼多朗.png'
+        },
+        {
+            name: '尼多力諾',
+            type: '毒',
+            height: '0.9m',
+            weight: '19.5kg',
+            image: 'images/尼多力諾.png'
+        },
+        {
+            name: '尼多王',
+            type: '毒、地面',
+            height: '1.4m',
+            weight: '62.0kg',
+            image: 'images/尼多王.png'
+        },
+        {
+            name: '皮皮',
+            type: '妖精',
+            height: '0.6m',
+            weight: '7.5kg',
+            image: 'images/皮皮.png'
+        },
+        {
+            name: '皮可西',
+            type: '妖精',
+            height: '1.3m',
+            weight: '40.0kg',
+            image: 'images/皮可西.png'
+        },
+        {
+            name: '六尾',
+            type: '火',
+            height: '0.6m',
+            weight: '9.9kg',
+            image: 'images/六尾.png'
+        },
+        {
+            name: '九尾',
+            type: '火',
+            height: '1.1m',
+            weight: '19.9kg',
+            image: 'images/九尾.png'
+        },
+        {
+            name: '胖丁',
+            type: '一般、妖精',
+            height: '0.5m',
+            weight: '5.5kg',
+            image: 'images/胖丁.png'
+        },
+        {
+            name: '胖可丁',
+            type: '一般、妖精',
+            height: '1.0m',
+            weight: '12.0kg',
+            image: 'images/胖可丁.png'
+        },
+            // 加入更多寶可夢的資料
+        ];
+
+        let currentIndex = 0;
+
+        function loadMore() {
+            const cardContainer = document.getElementById('cardContainer');
+            const loadMoreContainer = document.getElementById('loadMoreContainer');
+            const extraImageContainer = document.getElementById('extraImageContainer');
+            const randomImages = [
+            'images/急凍鳥.png',
+            'images/火焰鳥.png',
+            'images/閃電鳥.png',
+            'images/烈空坐.png',
+            'images/固拉多.png',
+            'images/蓋歐卡.png',
+            'images/夢幻.png',
+            'images/超夢.png',
+            'images/帕路奇亞.png',
+            'images/帝牙盧卡.png',
+            'images/騎拉帝納.png',
+            ];
+            function getRandomImage() {
+            const randomIndex = Math.floor(Math.random() * randomImages.length);
+            return randomImages[randomIndex];
+            }
+
+            function changeWindowImage(windowId) {
+                const windowElement = document.getElementById(windowId);
+                const imgElement = windowElement.querySelector('img');
+                imgElement.src = getRandomImage();
+            }
+
+            setInterval(() => {
+                
+                const leftWindow = document.getElementById('leftWindow');
+                const rightWindow = document.getElementById('rightWindow');
+
+                leftWindow.classList.add('hidden');
+                rightWindow.classList.remove('hidden');
+
+                setTimeout(() => {
+                    leftWindow.classList.remove('hidden');
+                    rightWindow.classList.add('hidden');
+                }, 1000); 
+
+                
+                changeWindowImage('leftWindow');
+                changeWindowImage('rightWindow');
+            }, 3000); 
+            const existingCards = document.querySelectorAll('.card');
+            gsap.set(existingCards, { opacity: 1 });
+                    
+            for (let i = 0; i < 8 && currentIndex < pokemonData.length; i++) {
+                const pokemon = pokemonData[currentIndex];
+                const card = document.createElement('div');
+                card.classList.add('card');
+
+                card.innerHTML = `
+                    <img src="${pokemon.image}" alt="${pokemon.name}">
+                    <h3>${pokemon.name}</h3>
+                    <p>屬性:${pokemon.type}</p>
+                    <p>身高:${pokemon.height}</p>
+                    <p>體重:${pokemon.weight}</p>
+                `;
+                gsap.set(card, { opacity: 0 });
+                cardContainer.appendChild(card);
+                gsap.to(card, { opacity: 1, duration: 1 });
+                currentIndex++;
+            }
+
+            if (currentIndex >= pokemonData.length) {
+                loadMoreContainer.style.display = 'none';
+                const extraImage = document.createElement('img');
+                extraImage.src = 'images/tobecontinued.png'; 
+                extraImage.style.width = '100%';
+                extraImageContainer.appendChild(extraImage);
+            }
+            
+        }
+
+        // 一開始顯示16個寶可夢
+        loadMore();
+        
+    </script>
+    <script>
+        //gsap.to(".b", { x: "500", rotation: "360", duration: "3" });
+        gsap.registerPlugin("ScrollTrigger");
+        gsap.to(".a",{
+            //scrollTrigger:".c",
+            scrollTrigger:{
+               trigger:".a",
+               //Actions: play,pause,resume,reverse,restart,reset,complete,none
+               toggleActions:"restart pause reverse none",
+               markers:true,
+               start:"top center",
+               end:"bottom 200px",
+               scrub:true,
+            },
+            x: "1300", rotation: "360", duration: "2",
+ 
+        })
+        
+ 
+     </script>
+ 
+     <script>
+     //gsap.to(".b", { x: "500", rotation: "360", duration: "3" });
+     gsap.registerPlugin("ScrollTrigger");
+     gsap.to(".b",{
+         //scrollTrigger:".c",
+         scrollTrigger:{
+             trigger:".b",
+             //Actions: play,pause,resume,reverse,restart,reset,complete,none
+             toggleActions:"restart pause reverse none",
+             markers:true,
+             start:"top center",
+             end:"bottom 200px",
+             scrub:true,
+         },
+         x: "1300", rotation: "360", duration: "4",
+ 
+     })
+ 
+     </script>
+ 
+     <script>
+      
+        //gsap.to(".b", { x: "500", rotation: "360", duration: "3" });
+        gsap.registerPlugin("ScrollTrigger");
+        gsap.to(".c",{
+            //scrollTrigger:".c",
+            scrollTrigger:{
+               trigger:".c",
+               //Actions: play,pause,resume,reverse,restart,reset,complete,none
+               toggleActions:"restart pause reverse none",
+               markers:true,
+               start:"top center",
+               end:"bottom 200px",
+               scrub:true,
+            },
+            x: "1300", rotation: "360", duration: "2",
+ 
+        })
+ 
+     </script>
+ 
+    <script>
+        //gsap.to(".b", { x: "500", rotation: "360", duration: "3" });
+        gsap.registerPlugin("ScrollTrigger");
+        gsap.to(".d",{
+            //scrollTrigger:".c",
+            scrollTrigger:{
+            trigger:".d",
+            //Actions: play,pause,resume,reverse,restart,reset,complete,none
+            toggleActions:"restart pause reverse none",
+            markers:true,
+            start:"top center",
+            end:"bottom 200px",
+            scrub:true,
+            },
+            x: "1300", rotation: "360", duration: "4",
+    
+        })
+    
+    </script>
+    <script>
+        //gsap.to(".b", { x: "500", rotation: "360", duration: "3" });
+        gsap.registerPlugin("ScrollTrigger");
+        gsap.to(".e",{
+            //scrollTrigger:".c",
+            scrollTrigger:{
+                trigger:".e",
+                //Actions: play,pause,resume,reverse,restart,reset,complete,none
+                toggleActions:"restart pause reverse none",
+                markers:true,
+                start:"top center",
+                end:"bottom 200px",
+                scrub:true,
+            },
+            x: "1300", rotation: "360", duration: "2",
+    
+        })
+    
+    </script>
+</body>
+
+</html>
